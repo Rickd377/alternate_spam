@@ -1,0 +1,21 @@
+@use 'sass:color' as c;
+
+$bg-square-size: 25px;
+$bg-line-width: 1px;
+$bg-color: #111;
+$bg-line-color: c.adjust($bg-color, $lightness: 7.5);
+
+$text-color-1: white;
+$text-color-2: c.change(white, $lightness: 85);
+$text-color-3: c.change(white, $lightness: 70);
+$text-color-4: c.change(white, $lightness: 55);
+
+$accent-color-1: #78d51c;
+$accent-color-2: #d51c1c;
+$container-color-1: #1a1a1a;
+$container-color-2: c.change($container-color-1, $lightness: 15%);
+$container-color-3: c.change($container-color-1, $lightness: 20%);
+
+$container-padding: 1rem;
+$container-br: 1.5rem;
+$inner-radius: calc($container-br - $container-padding);

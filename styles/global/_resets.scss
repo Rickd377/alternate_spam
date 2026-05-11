@@ -1,0 +1,73 @@
+html {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  height: 100svh;
+  @include flex;
+
+  background: repeating-linear-gradient($bg-line-color 0 $bg-line-width, #0000 $bg-line-width $bg-square-size),
+              repeating-linear-gradient(90deg, $bg-line-color 0 $bg-line-width, #0000 $bg-line-width $bg-square-size),
+              $bg-color;
+
+  background-size: 100% $bg-square-size, $bg-square-size 100%;
+  color: $text-color-3;
+  line-height: 1;
+  font-family: "Google Sans", sans-serif;
+  animation: scrollBg 5s linear infinite;
+
+  ul, ol {
+    list-style: none;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  img {
+    vertical-align: middle;
+    height: auto;
+    font-style: italic;
+    shape-margin: 1rem;
+    background: {
+      repeat: no-repeat;
+      size: cover;
+    }
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font-family: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}

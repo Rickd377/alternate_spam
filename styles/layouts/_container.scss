@@ -1,0 +1,46 @@
+.container {
+  @include flex(flex-start, flex-start, column);
+  gap: .5rem;
+  width: 700px;
+  background: $container-color-1;
+  border: 5px dashed $accent-color-1;
+  padding: $container-padding;
+  border-radius: $container-br;
+
+  .output {
+    @include flex(flex-start);
+    gap: .5rem;
+    padding: .5rem;
+    height: 3rem;
+    width: 100%;
+    min-width: 0;
+    background: $container-color-2;
+    border-radius: $inner-radius;
+    border: 3px dashed $container-color-3;
+    overflow-x: auto;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .el {
+      height: 100%;
+      width: .5rem;
+      border-radius: 99rem;
+      flex-shrink: 0;
+
+      &.correct {
+        background: $accent-color-1;
+      }
+
+      &.wrong {
+        background: $accent-color-2;
+      }
+    }
+
+    .placeholder {
+      color: $text-color-4;
+      margin-left: .5rem;
+    }
+  }
+}

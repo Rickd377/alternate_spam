@@ -1,0 +1,53 @@
+header {
+  h2 {
+    color: $text-color-1;
+  }
+}
+
+.nav {
+  @include flex(space-between);
+  width: 100%;
+  user-select: none;
+
+  .mode {
+    @include flex(flex-start);
+    gap: .5rem;
+
+    &:has(input:checked) .icon {
+      color: $accent-color-1;
+    }
+
+    hr {
+      height: .5rem;
+      width: 1px;
+      background: $text-color-3;
+      border: none;
+    }
+
+    .subnav {
+      @include flex(flex-start);
+      gap: .75rem;
+      
+      label {
+        input {
+          appearance: none;
+        }
+
+        &:has(input:checked) {
+          :nth-child(2) {
+            color: $accent-color-1;
+          }
+        }
+
+        :nth-child(2) {
+          cursor: pointer;
+          transition: color .15s ease;
+
+          &:hover {
+            color: $text-color-2;
+          }
+        }
+      }
+    }
+  }
+}
