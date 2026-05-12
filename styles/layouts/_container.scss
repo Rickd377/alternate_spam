@@ -16,6 +16,7 @@
   }
 
   .output {
+    position: relative;
     @include flex(flex-start);
     gap: .5rem;
     padding: .5rem;
