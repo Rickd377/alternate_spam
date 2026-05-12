@@ -8,6 +8,13 @@
 
   width: calc(700px + 2rem);
 
+  .output-header {
+   @include flex(space-between);
+   width: 100%;
+   font-size: .8rem;
+   color: $text-color-4;
+  }
+
   .output {
     @include flex(flex-start);
     gap: .5rem;
@@ -51,9 +58,17 @@
       }
     }
 
-    .placeholder {
+    .placeholder-text {
       color: $text-color-4;
       margin-left: .5rem;
+
+      kbd {
+        font-size: 1rem;
+        background: $container-color-1;
+        border-radius: $inner-radius;
+        padding: .1rem .25rem;
+        color: $text-color-3;
+      }
     }
   }
 
