@@ -1,11 +1,12 @@
 .container {
   @include flex(flex-start, flex-start, column);
   gap: .5rem;
-  width: 700px;
   background: $container-color-1;
   border: 5px dashed $accent-color-1;
   padding: $container-padding;
   border-radius: $container-br;
+
+  width: calc(700px + 2rem);
 
   .output {
     @include flex(flex-start);
@@ -21,6 +22,18 @@
 
     &::-webkit-scrollbar {
       display: none;
+    }
+
+    &.at-start {
+      mask-image: linear-gradient(to left, #0000, #000 10%);
+    }
+
+    &.in-between {
+      mask-image: linear-gradient(to right, #0000, #000 10% 90%, #0000);
+    }
+
+    &.at-end {
+      mask-image: linear-gradient(to right, #0000, #000 10%);
     }
 
     .el {
@@ -42,5 +55,13 @@
       color: $text-color-4;
       margin-left: .5rem;
     }
+  }
+
+  .wave-simulator {
+    border: 3px dashed $container-color-3;
+    background-color: $container-color-2;
+    border-radius: $inner-radius;
+    height: 200px;
+    width: 700px;
   }
 }

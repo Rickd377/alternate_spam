@@ -1,0 +1,106 @@
+[data-tooltip] {
+  $_caret-size: .3rem;
+
+  position: relative;
+
+  &::before,
+  &:after {
+    position: absolute;
+    background: $container-color-2;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 9999999;
+    transition: opacity .15s ease;
+  }
+
+  &[data-pos="top"],
+  &[data-pos="bottom"] {
+    &::before,
+    &::after {
+      left: 50%;
+      transform: translate(-50%, 0);
+    }
+
+    &::after {
+      height: $_caret-size;
+      aspect-ratio: 2 / 1;
+    }
+  }
+
+  &[data-pos="left"],
+  &[data-pos="right"] {
+    &::before,
+    &::after {
+      top: 50%;
+      transform: translate(0, -50%);
+    }
+
+    &::after {
+      width: $_caret-size;
+      aspect-ratio: 1 / 2;
+    }
+  }
+
+  &[data-pos="top"] {
+    &::before {
+      bottom: calc(100% + $_caret-size);
+    }
+
+    &::after {
+      bottom: 100%;
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+    }
+  }
+
+  &[data-pos="bottom"] {
+    &::before {
+      top: calc(100% + $_caret-size);
+    }
+
+    &::after {
+      top: 100%;
+      clip-path: polygon(50% 0, 0 100%, 100% 100%);
+    }
+  }
+
+  &[data-pos="right"] {
+    &::before {
+      left: calc(100% + $_caret-size * 2);
+    }
+
+    &::after {
+      left: calc(100% + $_caret-size);
+      clip-path: polygon(0 50%, 100% 0, 100% 100%);
+    }
+  }
+
+  &[data-pos="left"] {
+    &::before {
+      right: calc(100% + $_caret-size * 2);
+    }
+
+    &::after {
+      right: calc(100% + $_caret-size);
+      clip-path: polygon(100% 50%, 0 0, 0 100%);
+    }
+  }
+
+  &::before {
+    content: attr(data-tooltip);
+    color: $text-color-2;
+    white-space: nowrap;
+    padding: .5rem;
+    border-radius: $inner-radius;
+  }
+  
+  &::after {
+    content: "";
+  }
+  
+  &:hover {
+    &::before,
+    &::after {
+      opacity: 1;
+    }
+  }
+}

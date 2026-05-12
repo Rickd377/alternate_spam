@@ -20,31 +20,31 @@
 </head>
 <body>
   <div class="container">
-    <header>
+    <!-- <header>
       <h2>Practice Alternate Spamming</h2>
-    </header>
+    </header> -->
     <nav class="nav">
       <div class="mode" data-mode="time">
         <i class="ph ph-clock icon"></i>
         <hr>
         <nav class="subnav">
-          <label>
-            <input type="radio" name="mode-option">
+          <label data-tooltip="Spam for 5 seconds" data-pos="bottom" data-value="5s">
+            <input type="radio" name="mode-option" checked>
             <span>5s</span>
           </label>
-          <label>
+          <label data-tooltip="Spam for 10 seconds" data-pos="bottom" data-value="10s">
             <input type="radio" name="mode-option">
             <span>10s</span>
           </label>
-          <label>
+          <label data-tooltip="Spam for 20 seconds" data-pos="bottom" data-value="20s">
             <input type="radio" name="mode-option">
             <span>20s</span>
           </label>
-          <label>
+          <label data-tooltip="Spam for 30 seconds" data-pos="bottom" data-value="30s">
             <input type="radio" name="mode-option">
             <span>30s</span>
           </label>
-          <label>
+          <label data-tooltip="Spam for 60 seconds" data-pos="bottom" data-value="60s">
             <input type="radio" name="mode-option">
             <span>60s</span>
           </label>
@@ -54,23 +54,23 @@
         <i class="ph ph-repeat icon"></i>
         <hr>
         <nav class="subnav">
-          <label>
+          <label data-tooltip="Spam 25 times" data-pos="bottom" data-value="25x">
             <input type="radio" name="mode-option">
             <span>25x</span>
           </label>
-          <label>
+          <label data-tooltip="Spam 50 times" data-pos="bottom" data-value="50x">
             <input type="radio" name="mode-option">
             <span>50x</span>
           </label>
-          <label>
+          <label data-tooltip="Spam 100 times" data-pos="bottom" data-value="100x">
             <input type="radio" name="mode-option">
             <span>100x</span>
           </label>
-          <label>
+          <label data-tooltip="Spam 250 times" data-pos="bottom" data-value="250x">
             <input type="radio" name="mode-option">
             <span>250x</span>
           </label>
-          <label>
+          <label data-tooltip="Spam 500 times" data-pos="bottom" data-value="500x">
             <input type="radio" name="mode-option">
             <span>500x</span>
           </label>
@@ -78,78 +78,18 @@
       </div>
       <div class="mode" data-mode="infinite">
         <div class="subnav">
-          <label>
+          <label data-tooltip="Spam endless" data-pos="bottom">
             <input type="radio" name="mode-option">
             <i class="ph ph-infinity icon"></i>
           </label>
         </div>
       </div>
     </nav>
-    <!-- <div class="output">
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el wrong"></div>
-      <div class="el correct"></div>
-      <div class="el wrong"></div>
-      <span class="placeholder">start spamming at anytime...</span> -->
-    </div>
+    <div class="output"></div>
+    <!-- <canvas class="wave-simulator" width="700" height="200"></canvas> -->
   </div>
 
   <script src="./js/main.js"></script>
+  <script src="./js/wave.js"></script>
 </body>
 </html>
