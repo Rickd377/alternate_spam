@@ -4,6 +4,7 @@ let selectedOption = localStorage.getItem("selectedOption") || "5s";
 const tapSound = new Audio("../assets/sfx/tap.mp3");
 const keypressCorrectSound = new Audio("../assets/sfx/keypressCorrect.mp3");
 const keypressWrongSound = new Audio("../assets/sfx/keypressWrong.mp3");
+const endingSound = new Audio("../assets/sfx/end.mp3");
 
 document.querySelectorAll("input[name='mode-option']").forEach((input) => {
   const optionValue = input.parentElement.getAttribute("data-value");
@@ -70,6 +71,11 @@ function startRebinding(bindingKey, button) {
 function updateNextKeyDisplay() {
   if (!nextKeyEl) return;
 
+  if (sessionEnded || lastPressed === null) {
+    nextKeyEl.textContent = "";
+    return;
+  }
+
   const nextKey = lastPressed === normalizeKeyValue(key1) ? key2 : key1;
   nextKeyEl.textContent = "Next key: " + formatKeyLabel(nextKey);
 }
@@ -104,6 +110,9 @@ function endSession() {
     clearInterval(sessionTimerId);
     sessionTimerId = null;
   }
+
+  endingSound.currentTime = 0;
+  endingSound.play().catch(() => { });
 
   const end = document.createElement("div");
   end.className = "end";
@@ -194,8 +203,8 @@ function updatePlaceholder() {
       output.appendChild(el);
       
       el.querySelector('#kbd1')?.addEventListener('click', (e) => {
-        if (e.detail === 0) return;
         e.preventDefault();
+        if (rebindingKey === 'key1') return;
         tapSound.currentTime = 0;
         tapSound.play().catch(() => { });
         if (e.target instanceof HTMLElement) {
@@ -203,8 +212,8 @@ function updatePlaceholder() {
         }
       });
       el.querySelector('#kbd2')?.addEventListener('click', (e) => {
-        if (e.detail === 0) return;
         e.preventDefault();
+        if (rebindingKey === 'key2') return;
         tapSound.currentTime = 0;
         tapSound.play().catch(() => { });
         if (e.target instanceof HTMLElement) {
@@ -232,6 +241,16 @@ window.addEventListener("keydown", (e) => {
     const button = document.querySelector(buttonId);
     e.preventDefault();
     e.stopPropagation();
+    
+    const otherKey = rebindingKey === 'key1' ? key2 : key1;
+    if (newKey === normalizeKeyValue(otherKey)) {
+      if (button) {
+        const currentKey = rebindingKey === 'key1' ? key1 : key2;
+        button.textContent = formatKeyLabel(currentKey);
+      }
+      rebindingKey = null;
+      return;
+    }
     
     if (rebindingKey === 'key1') {
       key1 = newKey;

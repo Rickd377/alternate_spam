@@ -43,22 +43,22 @@
 
   &[data-pos="top"] {
     &::before {
-      bottom: calc(100% + $_caret-size);
+      bottom: calc(100% + $_caret-size * 2);
     }
 
     &::after {
-      bottom: 100%;
+      bottom: calc(100% + $_caret-size);
       clip-path: polygon(50% 100%, 0 0, 100% 0);
     }
   }
 
   &[data-pos="bottom"] {
     &::before {
-      top: calc(100% + $_caret-size);
+      top: calc(100% + $_caret-size * 2);
     }
 
     &::after {
-      top: 100%;
+      top: calc(100% + $_caret-size);
       clip-path: polygon(50% 0, 0 100%, 100% 100%);
     }
   }

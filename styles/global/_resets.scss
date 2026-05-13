@@ -70,4 +70,21 @@ body {
     outline: 2px solid currentColor;
     outline-offset: 2px;
   }
+
+  & * {
+    @media (max-width: 768px) {
+      display: none !important;
+    }
+  }
+
+  .responsive-message {
+    display: none;
+    font-size: 2rem;
+    margin-inline: 2rem;
+    text-align: center;
+
+    @media (max-width: 768px) {
+      display: block !important;
+    }
+  }
 }
