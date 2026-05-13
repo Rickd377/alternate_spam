@@ -26,28 +26,51 @@ document.querySelectorAll("input[name='mode-option']").forEach((input) => {
 });
 
 const output = document.querySelector(".output");
+const outputWrapper = document.querySelector(".output-wrapper");
 const nextKeyEl = document.querySelector(".next-key");
 const counterEl = document.querySelector(".counter");
 
-let key1 = "Arrowup" ;
-let key2 = "W";
+let key1 = localStorage.getItem("key1") || "arrowup";
+let key2 = localStorage.getItem("key2") || "w";
 let lastPressed = null;
 const heldKeys = new Set();
 let sessionRemaining = 0;
 let sessionEnded = false;
 let sessionTimerId = null;
 let sessionStarted = false;
+let rebindingKey = null;
+
+function normalizeKeyValue(key) {
+  if (key === ' ') return 'space';
+  return (key || '').toLowerCase();
+}
 
 function formatKeyLabel(key) {
-  return key
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  return normalizeKeyValue(key).replace(/-/g, " ");
+}
+
+function restoreRebindingLabel(bindingKey) {
+  const buttonId = bindingKey === 'key1' ? '#kbd1' : '#kbd2';
+  const button = document.querySelector(buttonId);
+  if (!button) return;
+
+  const currentKey = bindingKey === 'key1' ? key1 : key2;
+  button.textContent = formatKeyLabel(currentKey);
+}
+
+function startRebinding(bindingKey, button) {
+  if (rebindingKey && rebindingKey !== bindingKey) {
+    restoreRebindingLabel(rebindingKey);
+  }
+
+  rebindingKey = bindingKey;
+  button.textContent = '...';
 }
 
 function updateNextKeyDisplay() {
   if (!nextKeyEl) return;
 
-  const nextKey = lastPressed === key1.toLowerCase() ? key2 : key1;
+  const nextKey = lastPressed === normalizeKeyValue(key1) ? key2 : key1;
   nextKeyEl.textContent = "Next key: " + formatKeyLabel(nextKey);
 }
 
@@ -72,10 +95,6 @@ function updateCounterDisplay() {
   counterEl.textContent = `${Math.max(0, sessionRemaining)}x`;
 }
 
-function clearEndMarker() {
-  output?.querySelector(".end")?.remove();
-}
-
 function endSession() {
   if (sessionEnded) return;
 
@@ -86,6 +105,10 @@ function endSession() {
     sessionTimerId = null;
   }
 
+  const end = document.createElement("div");
+  end.className = "end";
+  end.innerHTML = `<span>round over. to play again, click the button bellow</span>`;
+  outputWrapper.appendChild(end);
   updateOverflowClasses();
   updatePlaceholder();
 }
@@ -118,7 +141,7 @@ function startSession() {
   sessionStarted = false;
   lastPressed = null;
   heldKeys.clear();
-  clearEndMarker();
+  outputWrapper?.querySelector(".end")?.remove();
   output.querySelectorAll(".el, .end").forEach((el) => el.remove());
 
   if (sessionTimerId) {
@@ -167,11 +190,31 @@ function updatePlaceholder() {
     if (!placeholder) {
       const el = document.createElement('span');
       el.className = 'placeholder-text';
-      el.innerHTML = `start spamming with <kbd>${key1}</kbd> + <kbd>${key2}</kbd> at any time...`;
+      el.innerHTML = `start spamming with <button id="kbd1">${formatKeyLabel(key1)}</button> + <button id="kbd2">${formatKeyLabel(key2)}</button> at any time...`;
       output.appendChild(el);
+      
+      el.querySelector('#kbd1')?.addEventListener('click', (e) => {
+        if (e.detail === 0) return;
+        e.preventDefault();
+        tapSound.currentTime = 0;
+        tapSound.play().catch(() => { });
+        if (e.target instanceof HTMLElement) {
+          startRebinding('key1', e.target);
+        }
+      });
+      el.querySelector('#kbd2')?.addEventListener('click', (e) => {
+        if (e.detail === 0) return;
+        e.preventDefault();
+        tapSound.currentTime = 0;
+        tapSound.play().catch(() => { });
+        if (e.target instanceof HTMLElement) {
+          startRebinding('key2', e.target);
+        }
+      });
     }
   } else if (placeholder) {
     placeholder.remove();
+    rebindingKey = null;
   }
 }
 
@@ -183,17 +226,47 @@ updatePlaceholder();
 startSession();
 
 window.addEventListener("keydown", (e) => {
+  if (rebindingKey) {
+    const newKey = normalizeKeyValue(e.key);
+    const buttonId = rebindingKey === 'key1' ? '#kbd1' : '#kbd2';
+    const button = document.querySelector(buttonId);
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (rebindingKey === 'key1') {
+      key1 = newKey;
+      localStorage.setItem('key1', key1);
+    } else if (rebindingKey === 'key2') {
+      key2 = newKey;
+      localStorage.setItem('key2', key2);
+    }
+    
+    if (button) {
+      button.textContent = formatKeyLabel(newKey);
+    }
+
+    updateNextKeyDisplay();
+
+    keypressCorrectSound.currentTime = 0;
+    keypressCorrectSound.play().catch(() => { });
+
+    rebindingKey = null;
+    return;
+  }
+
   if (sessionEnded) return;
 
   if (e.target instanceof HTMLElement && e.target.closest("input[name='mode-option']")) {
     return;
   }
 
-  const pressed = (e.key || '').toLowerCase();
-  const k1 = key1.toLowerCase();
-  const k2 = key2.toLowerCase();
+  const pressed = normalizeKeyValue(e.key);
+  const k1 = normalizeKeyValue(key1);
+  const k2 = normalizeKeyValue(key2);
 
   if (pressed !== k1 && pressed !== k2) return;
+
+  e.preventDefault();
 
   if (mode === "time" && !sessionStarted) {
     startTimeSession();
@@ -229,6 +302,17 @@ window.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("keyup", (e) => {
-  const key = (e.key || '').toLowerCase();
+  const key = normalizeKeyValue(e.key);
   if (heldKeys.has(key)) heldKeys.delete(key);
+});
+
+document.addEventListener("click", (e) => {
+  if (!rebindingKey) return;
+
+  const buttonId = rebindingKey === 'key1' ? '#kbd1' : '#kbd2';
+  const button = document.querySelector(buttonId);
+  if (button && e.target instanceof Node && button.contains(e.target)) return;
+
+  restoreRebindingLabel(rebindingKey);
+  rebindingKey = null;
 });

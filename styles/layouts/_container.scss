@@ -15,62 +15,86 @@
    color: $text-color-4;
   }
 
-  .output {
+  .output-wrapper {
     position: relative;
-    @include flex(flex-start);
-    gap: .5rem;
-    padding: .5rem;
-    height: 3rem;
     width: 100%;
-    min-width: 0;
-    background: $container-color-2;
-    border-radius: $inner-radius;
-    border: 3px dashed $container-color-3;
-    overflow-x: auto;
 
-    &::-webkit-scrollbar {
-      display: none;
+    .end {
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(5px);
+      background: rgba($container-color-1, .5);
+      @include flex;
+      border-radius: $inner-radius;
+      color: $text-color-2;
+      font-weight: 600;
     }
 
-    &.at-start {
-      mask-image: linear-gradient(to left, #0000, #000 10%);
-    }
+    .output {
+      @include flex(flex-start);
+      gap: .5rem;
+      padding: .5rem;
+      height: 3rem;
+      width: 100%;
+      min-width: 0;
+      background: $container-color-2;
+      border-radius: $inner-radius;
+      border: 3px dashed $container-color-3;
+      overflow-x: auto;
 
-    &.in-between {
-      mask-image: linear-gradient(to right, #0000, #000 10% 90%, #0000);
-    }
-
-    &.at-end {
-      mask-image: linear-gradient(to right, #0000, #000 10%);
-    }
-
-    .el {
-      height: 100%;
-      width: .5rem;
-      border-radius: 99rem;
-      flex-shrink: 0;
-
-      &.correct {
-        background: $accent-color-1;
+      &::-webkit-scrollbar {
+        display: none;
       }
 
-      &.wrong {
-        background: $accent-color-2;
+      &.at-start {
+        mask-image: linear-gradient(to left, #0000, #000 10%);
+      }
+
+      &.in-between {
+        mask-image: linear-gradient(to right, #0000, #000 10% 90%, #0000);
+      }
+
+      &.at-end {
+        mask-image: linear-gradient(to right, #0000, #000 10%);
+      }
+
+      .el {
+        height: 100%;
+        width: .5rem;
+        border-radius: 99rem;
+        flex-shrink: 0;
+
+        &.correct {
+          background: $accent-color-1;
+        }
+
+        &.wrong {
+          background: $accent-color-2;
+        }
+      }
+
+      .placeholder-text {
+        color: $text-color-4;
+        margin-left: .5rem;
+        user-select: none;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        button {
+          border: none;
+          outline: none;
+          width: fit-content;
+          font-size: 1rem;
+          background: $container-color-1;
+          border-radius: $inner-radius;
+          padding: .1rem .25rem;
+          color: $text-color-3;
+          text-align: left;
+        }
       }
     }
 
-    .placeholder-text {
-      color: $text-color-4;
-      margin-left: .5rem;
-
-      kbd {
-        font-size: 1rem;
-        background: $container-color-1;
-        border-radius: $inner-radius;
-        padding: .1rem .25rem;
-        color: $text-color-3;
-      }
-    }
   }
 
   .wave-simulator {
