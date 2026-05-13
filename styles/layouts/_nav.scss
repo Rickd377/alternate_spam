@@ -27,6 +27,7 @@
       label {
         input {
           appearance: none;
+          outline: none;
         }
 
         &:has(input:checked) {

@@ -1,3 +1,4 @@
+/* Persistent settings */
 let mode = localStorage.getItem("mode") || "time";
 let selectedOption = localStorage.getItem("selectedOption") || "5s";
 
@@ -6,31 +7,12 @@ const keypressCorrectSound = new Audio("../assets/sfx/keypressCorrect.mp3");
 const keypressWrongSound = new Audio("../assets/sfx/keypressWrong.mp3");
 const endingSound = new Audio("../assets/sfx/end.mp3");
 
-document.querySelectorAll("input[name='mode-option']").forEach((input) => {
-  const optionValue = input.parentElement.getAttribute("data-value");
-  const inputMode = input.closest("[data-mode]")?.getAttribute("data-mode");
-
-  if (inputMode === mode && optionValue === selectedOption) {
-    input.checked = true;
-  }
-
-  input.addEventListener("change", () => {
-    tapSound.currentTime = 0;
-    tapSound.play().catch(() => { });
-    mode = input.closest("[data-mode]")?.getAttribute("data-mode");
-    selectedOption = optionValue;
-    localStorage.setItem("mode", mode);
-    localStorage.setItem("selectedOption", selectedOption);
-    input.blur();
-    startSession();
-  });
-});
-
 const output = document.querySelector(".output");
 const outputWrapper = document.querySelector(".output-wrapper");
 const nextKeyEl = document.querySelector(".next-key");
 const counterEl = document.querySelector(".counter");
 
+/* Runtime state */
 let key1 = localStorage.getItem("key1") || "arrowup";
 let key2 = localStorage.getItem("key2") || "w";
 let lastPressed = null;
@@ -40,23 +22,31 @@ let sessionEnded = false;
 let sessionTimerId = null;
 let sessionStarted = false;
 let rebindingKey = null;
+let sessionLimit = 0;
 
+/* Helpers */
 function normalizeKeyValue(key) {
-  if (key === ' ') return 'space';
-  return (key || '').toLowerCase();
+  if (key === " ") return "space";
+  return (key || "").toLowerCase();
 }
 
 function formatKeyLabel(key) {
   return normalizeKeyValue(key).replace(/-/g, " ");
 }
 
+function getBindingButton(bindingKey) {
+  return document.querySelector(bindingKey === "key1" ? "#kbd1" : "#kbd2");
+}
+
+function getBoundKey(bindingKey) {
+  return bindingKey === "key1" ? key1 : key2;
+}
+
 function restoreRebindingLabel(bindingKey) {
-  const buttonId = bindingKey === 'key1' ? '#kbd1' : '#kbd2';
-  const button = document.querySelector(buttonId);
+  const button = getBindingButton(bindingKey);
   if (!button) return;
 
-  const currentKey = bindingKey === 'key1' ? key1 : key2;
-  button.textContent = formatKeyLabel(currentKey);
+  button.textContent = formatKeyLabel(getBoundKey(bindingKey));
 }
 
 function startRebinding(bindingKey, button) {
@@ -65,7 +55,14 @@ function startRebinding(bindingKey, button) {
   }
 
   rebindingKey = bindingKey;
-  button.textContent = '...';
+  button.textContent = "...";
+}
+
+function cancelRebinding() {
+  if (!rebindingKey) return;
+
+  restoreRebindingLabel(rebindingKey);
+  rebindingKey = null;
 }
 
 function updateNextKeyDisplay() {
@@ -77,7 +74,7 @@ function updateNextKeyDisplay() {
   }
 
   const nextKey = lastPressed === normalizeKeyValue(key1) ? key2 : key1;
-  nextKeyEl.textContent = "Next key: " + formatKeyLabel(nextKey);
+  nextKeyEl.textContent = "next key: " + formatKeyLabel(nextKey);
 }
 
 function getSelectedLimit() {
@@ -98,7 +95,68 @@ function updateCounterDisplay() {
     return;
   }
 
-  counterEl.textContent = `${Math.max(0, sessionRemaining)}x`;
+  const remaining = Math.max(0, sessionRemaining);
+  const total = sessionLimit || getSelectedLimit();
+  const completed = total - remaining;
+  counterEl.textContent = `${completed}/${total}`;
+}
+
+function updateOverflowClasses() {
+  if (!output) return;
+
+  const horizontal = output.scrollWidth > output.clientWidth;
+
+  output.classList.toggle("overflow", horizontal);
+  output.classList.remove("at-start", "at-end", "in-between");
+
+  if (!horizontal) return;
+
+  if (output.scrollLeft <= 0) {
+    output.classList.add("at-start");
+  } else if (output.scrollLeft + output.clientWidth >= output.scrollWidth - 1) {
+    output.classList.add("at-end");
+  } else {
+    output.classList.add("in-between");
+  }
+}
+
+function updatePlaceholder() {
+  if (!output) return;
+
+  const hasItem = !!output.querySelector(".el");
+  const placeholder = output.querySelector(".placeholder-text");
+
+  if (!hasItem) {
+    if (!placeholder) {
+      const el = document.createElement("span");
+      el.className = "placeholder-text";
+      el.innerHTML = `start spamming with <button id="kbd1">${formatKeyLabel(key1)}</button> + <button id="kbd2">${formatKeyLabel(key2)}</button> at any time...`;
+      output.appendChild(el);
+
+      el.querySelector("#kbd1")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (rebindingKey === "key1") return;
+        tapSound.currentTime = 0;
+        tapSound.play().catch(() => { });
+        if (e.target instanceof HTMLElement) {
+          startRebinding("key1", e.target);
+        }
+      });
+
+      el.querySelector("#kbd2")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (rebindingKey === "key2") return;
+        tapSound.currentTime = 0;
+        tapSound.play().catch(() => { });
+        if (e.target instanceof HTMLElement) {
+          startRebinding("key2", e.target);
+        }
+      });
+    }
+  } else if (placeholder) {
+    placeholder.remove();
+    rebindingKey = null;
+  }
 }
 
 function endSession() {
@@ -162,6 +220,7 @@ function startSession() {
     sessionRemaining = getSelectedLimit();
   } else if (mode === "reps") {
     sessionRemaining = getSelectedLimit();
+    sessionLimit = sessionRemaining;
   } else {
     sessionRemaining = Infinity;
   }
@@ -171,121 +230,56 @@ function startSession() {
   updatePlaceholder();
 }
 
-function updateOverflowClasses() {
-  if (!output) return;
+function handleRebindingKeydown(event) {
+  const newKey = normalizeKeyValue(event.key);
+  const button = getBindingButton(rebindingKey);
 
-  const horizontal = output.scrollWidth > output.clientWidth;
+  event.preventDefault();
+  event.stopPropagation();
 
-  output.classList.toggle("overflow", horizontal);
-  output.classList.remove("at-start", "at-end", "in-between");
-
-  if (!horizontal) return;
-
-  if (output.scrollLeft <= 0) {
-    output.classList.add("at-start");
-  } else if (output.scrollLeft + output.clientWidth >= output.scrollWidth - 1) {
-    output.classList.add("at-end");
-  } else {
-    output.classList.add("in-between");
-  }
-}
-
-function updatePlaceholder() {
-  if (!output) return;
-  const hasItem = !!output.querySelector('.el');
-  const placeholder = output.querySelector('.placeholder-text');
-
-  if (!hasItem) {
-    if (!placeholder) {
-      const el = document.createElement('span');
-      el.className = 'placeholder-text';
-      el.innerHTML = `start spamming with <button id="kbd1">${formatKeyLabel(key1)}</button> + <button id="kbd2">${formatKeyLabel(key2)}</button> at any time...`;
-      output.appendChild(el);
-      
-      el.querySelector('#kbd1')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (rebindingKey === 'key1') return;
-        tapSound.currentTime = 0;
-        tapSound.play().catch(() => { });
-        if (e.target instanceof HTMLElement) {
-          startRebinding('key1', e.target);
-        }
-      });
-      el.querySelector('#kbd2')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (rebindingKey === 'key2') return;
-        tapSound.currentTime = 0;
-        tapSound.play().catch(() => { });
-        if (e.target instanceof HTMLElement) {
-          startRebinding('key2', e.target);
-        }
-      });
-    }
-  } else if (placeholder) {
-    placeholder.remove();
-    rebindingKey = null;
-  }
-}
-
-output.addEventListener("scroll", () => { updateOverflowClasses(); updatePlaceholder(); });
-window.addEventListener("resize", () => { updateOverflowClasses(); updatePlaceholder(); });
-
-updateOverflowClasses();
-updatePlaceholder();
-startSession();
-
-window.addEventListener("keydown", (e) => {
-  if (rebindingKey) {
-    const newKey = normalizeKeyValue(e.key);
-    const buttonId = rebindingKey === 'key1' ? '#kbd1' : '#kbd2';
-    const button = document.querySelector(buttonId);
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const otherKey = rebindingKey === 'key1' ? key2 : key1;
-    if (newKey === normalizeKeyValue(otherKey)) {
-      if (button) {
-        const currentKey = rebindingKey === 'key1' ? key1 : key2;
-        button.textContent = formatKeyLabel(currentKey);
-      }
-      rebindingKey = null;
-      return;
-    }
-    
-    if (rebindingKey === 'key1') {
-      key1 = newKey;
-      localStorage.setItem('key1', key1);
-    } else if (rebindingKey === 'key2') {
-      key2 = newKey;
-      localStorage.setItem('key2', key2);
-    }
-    
+  const otherKey = rebindingKey === "key1" ? key2 : key1;
+  if (newKey === normalizeKeyValue(otherKey)) {
     if (button) {
-      button.textContent = formatKeyLabel(newKey);
+      button.textContent = formatKeyLabel(getBoundKey(rebindingKey));
     }
-
-    updateNextKeyDisplay();
-
-    keypressCorrectSound.currentTime = 0;
-    keypressCorrectSound.play().catch(() => { });
-
     rebindingKey = null;
     return;
   }
 
+  if (rebindingKey === "key1") {
+    key1 = newKey;
+    localStorage.setItem("key1", key1);
+  } else if (rebindingKey === "key2") {
+    key2 = newKey;
+    localStorage.setItem("key2", key2);
+  }
+
+  if (button) {
+    button.textContent = formatKeyLabel(newKey);
+  }
+
+  updateNextKeyDisplay();
+
+  keypressCorrectSound.currentTime = 0;
+  keypressCorrectSound.play().catch(() => { });
+
+  rebindingKey = null;
+}
+
+function handleGameplayKeydown(event) {
   if (sessionEnded) return;
 
-  if (e.target instanceof HTMLElement && e.target.closest("input[name='mode-option']")) {
+  if (event.target instanceof HTMLElement && event.target.closest("input[name='mode-option']")) {
     return;
   }
 
-  const pressed = normalizeKeyValue(e.key);
+  const pressed = normalizeKeyValue(event.key);
   const k1 = normalizeKeyValue(key1);
   const k2 = normalizeKeyValue(key2);
 
   if (pressed !== k1 && pressed !== k2) return;
 
-  e.preventDefault();
+  event.preventDefault();
 
   if (mode === "time" && !sessionStarted) {
     startTimeSession();
@@ -294,13 +288,15 @@ window.addEventListener("keydown", (e) => {
   if (heldKeys.has(pressed)) return;
   heldKeys.add(pressed);
 
-  const cls = pressed === lastPressed ? 'wrong' : 'correct';
+  const cls = pressed === lastPressed ? "wrong" : "correct";
   lastPressed = pressed;
-  const sound = cls === 'correct' ? keypressCorrectSound : keypressWrongSound;
+
+  const sound = cls === "correct" ? keypressCorrectSound : keypressWrongSound;
   if (sound) {
     sound.currentTime = 0;
-    sound.play().catch(() => {});
+    sound.play().catch(() => { });
   }
+
   const el = document.createElement("div");
   el.className = `el ${cls}`;
   output.appendChild(el);
@@ -318,20 +314,64 @@ window.addEventListener("keydown", (e) => {
   updateOverflowClasses();
   updatePlaceholder();
   updateNextKeyDisplay();
+}
+
+/* Mode selection wiring */
+document.querySelectorAll("input[name='mode-option']").forEach((input) => {
+  const optionValue = input.parentElement.getAttribute("data-value");
+  const inputMode = input.closest("[data-mode]")?.getAttribute("data-mode");
+
+  if (inputMode === mode && optionValue === selectedOption) {
+    input.checked = true;
+  }
+
+  input.addEventListener("change", () => {
+    tapSound.currentTime = 0;
+    tapSound.play().catch(() => { });
+    mode = input.closest("[data-mode]")?.getAttribute("data-mode");
+    selectedOption = optionValue;
+    localStorage.setItem("mode", mode);
+    localStorage.setItem("selectedOption", selectedOption);
+    input.blur();
+    startSession();
+  });
 });
 
-window.addEventListener("keyup", (e) => {
-  const key = normalizeKeyValue(e.key);
+/* UI refresh */
+output.addEventListener("scroll", () => {
+  updateOverflowClasses();
+  updatePlaceholder();
+});
+
+window.addEventListener("resize", () => {
+  updateOverflowClasses();
+  updatePlaceholder();
+});
+
+updateOverflowClasses();
+updatePlaceholder();
+startSession();
+
+/* Input handling */
+window.addEventListener("keydown", (event) => {
+  if (rebindingKey) {
+    handleRebindingKeydown(event);
+    return;
+  }
+
+  handleGameplayKeydown(event);
+});
+
+window.addEventListener("keyup", (event) => {
+  const key = normalizeKeyValue(event.key);
   if (heldKeys.has(key)) heldKeys.delete(key);
 });
 
-document.addEventListener("click", (e) => {
+document.addEventListener("click", (event) => {
   if (!rebindingKey) return;
 
-  const buttonId = rebindingKey === 'key1' ? '#kbd1' : '#kbd2';
-  const button = document.querySelector(buttonId);
-  if (button && e.target instanceof Node && button.contains(e.target)) return;
+  const button = getBindingButton(rebindingKey);
+  if (button && event.target instanceof Node && button.contains(event.target)) return;
 
-  restoreRebindingLabel(rebindingKey);
-  rebindingKey = null;
+  cancelRebinding();
 });

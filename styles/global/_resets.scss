@@ -25,6 +25,10 @@ body {
   font-family: "Google Sans", sans-serif;
   animation: scrollBg 5s linear infinite;
 
+  @media (prefers-reduced-motion: reduce) {
+    animation-play-state: paused;
+  }
+
   ul, ol {
     list-style: none;
   }

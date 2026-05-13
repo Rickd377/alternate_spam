@@ -6,7 +6,7 @@
   padding: $container-padding;
   border-radius: $container-br;
 
-  width: calc(700px + 2rem);
+  width: calc(700px + 2rem); // temp
 
   .output-header {
    @include flex(space-between);

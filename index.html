@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AltTap is a website made for practicing alternate spamming for games like Geometry Dash">
 
   <!-- Browser customization -->
   <meta name="theme-color" content="#18181B">
@@ -19,29 +20,29 @@
   <title>AltTap</title>
 </head>
 <body>
-  <div class="container">
+  <div class="container" role="main">
     <nav class="nav">
       <div class="mode" data-mode="time">
         <i class="ph ph-clock icon"></i>
         <hr>
-        <nav class="subnav">
-          <label data-tooltip="Spam for 5 seconds" data-pos="top" data-value="5s">
+        <nav class="subnav" role="navigation">
+          <label data-tooltip="Spam for 5 seconds" data-pos="top" data-value="5s" aria-label="spam 5 seconds">
             <input type="radio" name="mode-option" checked>
             <span>5s</span>
           </label>
-          <label data-tooltip="Spam for 10 seconds" data-pos="top" data-value="10s">
+          <label data-tooltip="Spam for 10 seconds" data-pos="top" data-value="10s" aria-label="spam 10 seconds">
             <input type="radio" name="mode-option">
             <span>10s</span>
           </label>
-          <label data-tooltip="Spam for 20 seconds" data-pos="top" data-value="20s">
+          <label data-tooltip="Spam for 20 seconds" data-pos="top" data-value="20s" aria-label="spam 20 seconds">
             <input type="radio" name="mode-option">
             <span>20s</span>
           </label>
-          <label data-tooltip="Spam for 30 seconds" data-pos="top" data-value="30s">
+          <label data-tooltip="Spam for 30 seconds" data-pos="top" data-value="30s" aria-label="spam 30 seconds">
             <input type="radio" name="mode-option">
             <span>30s</span>
           </label>
-          <label data-tooltip="Spam for 60 seconds" data-pos="top" data-value="60s">
+          <label data-tooltip="Spam for 60 seconds" data-pos="top" data-value="60s" aria-label="spam 60 seconds">
             <input type="radio" name="mode-option">
             <span>60s</span>
           </label>
@@ -50,44 +51,44 @@
       <div class="mode" data-mode="reps">
         <i class="ph ph-repeat icon"></i>
         <hr>
-        <nav class="subnav">
-          <label data-tooltip="Spam 25 times" data-pos="top" data-value="25x">
+        <nav class="subnav" role="navigation">
+          <label data-tooltip="Spam 25 times" data-pos="top" data-value="25x" aria-label="spam 25 times">
             <input type="radio" name="mode-option">
             <span>25x</span>
           </label>
-          <label data-tooltip="Spam 50 times" data-pos="top" data-value="50x">
+          <label data-tooltip="Spam 50 times" data-pos="top" data-value="50x" aria-label="spam 50 times">
             <input type="radio" name="mode-option">
             <span>50x</span>
           </label>
-          <label data-tooltip="Spam 100 times" data-pos="top" data-value="100x">
+          <label data-tooltip="Spam 100 times" data-pos="top" data-value="100x" aria-label="spam 100 times">
             <input type="radio" name="mode-option">
             <span>100x</span>
           </label>
-          <label data-tooltip="Spam 250 times" data-pos="top" data-value="250x">
+          <label data-tooltip="Spam 250 times" data-pos="top" data-value="250x" aria-label="spam 250 times">
             <input type="radio" name="mode-option">
             <span>250x</span>
           </label>
-          <label data-tooltip="Spam 500 times" data-pos="top" data-value="500x">
+          <label data-tooltip="Spam 500 times" data-pos="top" data-value="500x" aria-label="spam 500 times">
             <input type="radio" name="mode-option">
             <span>500x</span>
           </label>
         </nav>
       </div>
       <div class="mode" data-mode="infinite">
-        <div class="subnav">
-          <label data-tooltip="Spam endless" data-pos="top">
+        <nav class="subnav" role="navigation">
+          <label data-tooltip="Spam endless" data-pos="top" aria-label="spam for infinity">
             <input type="radio" name="mode-option">
             <i class="ph ph-infinity icon"></i>
           </label>
-        </div>
+        </nav>
       </div>
     </nav>
-    <header class="output-header">
+    <header class="output-header" role="contentinfo">
       <span class="next-key"></span>
       <span class="counter"></span>
     </header>
     <div class="output-wrapper">
-      <div class="output"></div>
+      <div class="output" role="group"></div>
     </div>
     <!-- <canvas class="wave-simulator" width="700" height="200"></canvas> -->
   </div>
